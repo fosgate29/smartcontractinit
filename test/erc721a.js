@@ -13,9 +13,7 @@ const MAX_UINT256 = new BN("2").pow(new BN("256")).sub(new BN("1"));
 
 contract("ERC721A", async (accounts) => {
   const OWNER = accounts[0]; //also ADMIN
-  const USER1 = accounts[1];
-  const USER2 = accounts[2];
-  const USER3 = accounts[3];
+  const USER1 = accounts[1]; const USER2 = accounts[2];  const USER3 = accounts[3];
 
   const WALLET_A = accounts[4];
   const WALLET_B = accounts[5];
@@ -39,12 +37,14 @@ contract("ERC721A", async (accounts) => {
   describe("setup", () => {
     it("should have correct name and symbol", async () => {
       const name = await erc721A.name();
+
       const symbol = await erc721A.symbol();
       assert.equal(_name, name);
-      assert.equal(_symbol, symbol);
+
+         assert.equal(_symbol, symbol);
     });
 
-    it("should not allow mint 0 tokens", async () => {
+    it('should not allow mint 0 tokens', async () => {
       await truffleAssert.reverts(erc721A.mint(USER1, 0, { from: USER1 }));
     });
 
