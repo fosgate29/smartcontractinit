@@ -46,15 +46,13 @@ contract("ERC721A", async (accounts) => {
       assert.equal(_symbol, symbol);
     });
 
-    it("should not allow mint 0 tokens", async () => {
+    it('should not allow mint 0 tokens', async () => {
       await truffleAssert.reverts(erc721A.mint(USER1, 0, { from: USER1 }));
     });
 
     it("should be able to mint", async () => {
-      let tx = await erc721A.mint(USER1, 1, { from: USER1 });
-      console.log("mint cost = ", tx.receipt.gasUsed);
-      tx = await erc721A.mint(USER1, 100, { from: USER1 });
-      console.log("mint cost = ", tx.receipt.gasUsed);
+      let tx = await erc721A.mint(USER1, 1, { from: USER1 });      console.log("mint cost = ", tx.receipt.gasUsed);
+      tx = await erc721A.mint(USER1, 100, { from: USER1 });      console.log("mint cost = ", tx.receipt.gasUsed);
 
       tx = await erc721A.mint(USER2, 1, { from: USER2 });
       console.log("mint cost = ", tx.receipt.gasUsed);
