@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
@@ -24,6 +25,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 contract ERC721A is Context, ERC165, IERC721A {
     using Address for address;
     using Strings for uint256;
+    using SignatureChecker for address;
 
     // The tokenId of the next token to be minted.
     uint256 internal _currentIndex;
@@ -275,7 +277,9 @@ contract ERC721A is Context, ERC165, IERC721A {
      * @dev See {IERC721-safeTransferFrom}.
      */
     function safeTransferFrom(
-        address from,        address to,         uint256 tokenId
+        address from,
+        address to,
+        uint256 tokenId
     ) public virtual override {
         safeTransferFrom(from, to, tokenId, "");
     }
@@ -314,9 +318,39 @@ contract ERC721A is Context, ERC165, IERC721A {
     function _safeMint(address to, uint256 quantity) internal {
         _safeMint(to, quantity, "");
     }
+    
+    // address used to sign whitelisted addresses
+    address private signer;
+
+    // here is a test and it doesn't have a control who can set signer.
+    // but in Prod it should be owner or use a Role to control it
+    function setSigner(address _signer) external {
+        signer = _signer;
+    }
+
+    function mintSigned( bytes memory _signature, address to, uint256 quantity) external {
+        require(isWhitelisted(quantity, _signature), "Not whitelisted");
+        _safeMint(to, quantity, "");
+    }
 
     function mint(address to, uint256 quantity) external {
         _safeMint(to, quantity, "");
+    }
+
+    /// @dev Returns if user is whitelisted to mint tokens.
+    function isWhitelisted(
+        uint256 _amount,
+        bytes memory _signature
+    ) internal view returns (bool) {
+        bytes32 result =
+            keccak256(
+                abi.encodePacked(
+                    _amount,
+                    msg.sender
+                )
+            );
+        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", result));
+        return signer.isValidSignatureNow(hash, _signature);
     }
 
     /**
