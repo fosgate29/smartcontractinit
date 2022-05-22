@@ -275,9 +275,7 @@ contract ERC721A is Context, ERC165, IERC721A {
      * @dev See {IERC721-safeTransferFrom}.
      */
     function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
+        address from,        address to,         uint256 tokenId
     ) public virtual override {
         safeTransferFrom(from, to, tokenId, "");
     }
